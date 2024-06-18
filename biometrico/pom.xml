@@ -26,6 +26,21 @@
             <artifactId>dpotjni</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>digitalpersona</groupId>
+            <artifactId>dpuareu</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>digitalpersona</groupId>
+            <artifactId>AbsoluteLayout</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>digitalpersona</groupId>
+            <artifactId>swing-worker</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

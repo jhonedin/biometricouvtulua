@@ -1,3 +1,5 @@
-https://recursostulua.univalle.edu.co/sites/db/phpmyadmin/index.php
+ENLACE BASE DE DATOS: https://recursostulua.univalle.edu.co/sites/db/phpmyadmin/index.php
+USUARIO: biometrico
+PASSWORD: univalle**
 
 https://recursostulua.univalle.edu.co/sites/UareUSampleWEB/#

@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 /**
  *
- * @author JHON EDINSON BLANDON QUINTERO
+ * @author Ing.JHON EDINSON BLANDON QUINTERO
  */
 
 

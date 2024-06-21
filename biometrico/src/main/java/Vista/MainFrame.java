@@ -5,16 +5,128 @@ package Vista;
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  *
- * @author USER
+ * @author Ing.JHON EDINSON BLANDON QUINTERO
  */
 public class MainFrame extends javax.swing.JFrame {
-
+    
+    private JLabel titulo;
+    private JLabel logoUnivalle;
+    private JLabel labelSede;
+    private JLabel labelSolicitudCedula;
+    private JTextField textFieldCedula = null;
+    private JButton btnVerificarHuella;
+    private JButton btnRegistrarHuella;
+    private JLabel labelMensaje;
+    private JLabel relojLabel;
+    private JButton btnCerrar;
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
+        this.setSize(1350,720);
+        this.setTitle("SISTEMA BIOMÉTRICO DE CONTROL DE ASISTENCIA DOCENTE");
+        this.setBackground(Color.darkGray);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Crear el panel
+        JPanel panelMainFrame = new JPanel();
+        panelMainFrame.setLayout(null); // Establecer el diseño nulo para usar setBounds
+        // Arreglo los parametros del titulo
+        titulo = new JLabel("SISTEMA BIOMÉTRICO DE CONTROL DE ASISTENCIA DOCENTE");
+        titulo.setBounds(250, 10, 900, 80);
+        titulo.setForeground(Color.RED);
+        titulo.setFont(new Font("Arial", Font.BOLD, 28));
+        // Arreglo los parametros del logo de Univalle
+        ImageIcon iconUnivalle = new ImageIcon("imagenes/logounivalle.png");
+        logoUnivalle = new JLabel(iconUnivalle);
+        logoUnivalle.setBounds(150,160, 281,400);
+        //Arreglo los parametros del label de la sede tulua
+        labelSede = new JLabel("Sede Tuluá");
+        labelSede.setBounds(215,540,300,80);
+        labelSede.setForeground(Color.RED);
+        labelSede.setFont(new Font("Arial", Font.BOLD, 28));
+        //Arreglo los parametros del label de solicitud de la cedula.
+        labelSolicitudCedula = new JLabel("Inicie ingresando su cedula");
+        labelSolicitudCedula.setBounds(700,130,400,80);
+        labelSolicitudCedula.setForeground(Color.RED);
+        labelSolicitudCedula.setFont(new Font("Arial", Font.BOLD, 24));
+        // Arreglo los parametros del campo de texto de la cedula
+        textFieldCedula = new JTextField();
+        textFieldCedula.setBounds(710,215, 300, 50);
+        textFieldCedula.setFont(new Font("Arial", Font.BOLD, 26));
+        // Arreglo los parametros del boton de verificar huella
+        btnVerificarHuella = new JButton("Verificar Huella");
+        btnVerificarHuella.setBounds(710,280, 300, 50);
+        btnVerificarHuella.setFont(new Font("Arial", Font.BOLD, 26));
+        // Arreglo los parametros del boton de registrar huella
+        btnRegistrarHuella = new JButton("Registrar Nuevo");
+        btnRegistrarHuella.setBounds(710,400, 300, 50);
+        btnRegistrarHuella.setFont(new Font("Arial", Font.BOLD, 26));
+        // Arreglo los parametros del label del mensaje de para un nuevo registro
+        labelMensaje = new JLabel("<html>Para registrar un nuevo usuario por favor ponerse en contacto con el monitor de Recursos Tecnológicos de turno.</html>");   
+        labelMensaje.setBounds(710,435, 300, 100);
+        labelMensaje.setForeground(Color.RED);
+        labelMensaje.setFont(new Font("Arial", Font.BOLD, 14));
+        labelMensaje.setHorizontalAlignment(SwingConstants.CENTER);
+        // Arreglo los ajustes del reloj de tiempo real.
+        relojLabel = new JLabel();
+        relojLabel.setBounds(470,620, 360, 30);
+        relojLabel.setForeground(Color.RED);
+        relojLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        relojLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Arreglo los ajustes del boton de cerrar el frame y terminar programa
+        btnCerrar = new JButton("Cerrar");
+        btnCerrar.setBounds(1120,620, 150, 30);
+        btnCerrar.setBackground(Color.RED);
+        btnCerrar.setForeground(Color.WHITE);
+        btnCerrar.setFocusPainted(false);
+        
+        // Agregar ActionListener al botón cerrar
+        btnCerrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        
+        // Configurar el Timer para actualizar el reloj cada segundo
+        Timer timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SimpleDateFormat sdf = new SimpleDateFormat("EEEE, dd MMMM yyyy hh:mm:ss a");
+                Date now = new Date();
+                relojLabel.setText(sdf.format(now));
+            }
+        });
+        timer.start();
+       
+       
+        // Agregar el JLabel al panel
+        panelMainFrame.add(titulo);
+        panelMainFrame.add(logoUnivalle);
+        panelMainFrame.add(labelSede);
+        panelMainFrame.add(labelSolicitudCedula);
+        panelMainFrame.add(textFieldCedula);
+        panelMainFrame.add(btnVerificarHuella);
+        panelMainFrame.add(btnRegistrarHuella);
+        panelMainFrame.add(labelMensaje);
+        panelMainFrame.add(relojLabel);
+        panelMainFrame.add(btnCerrar);
+        
+        // Agregar el panel al marco
+        this.add(panelMainFrame);
+        
+        // Hacer visible el marco
+        this.setVisible(true);
         initComponents();
     }
 

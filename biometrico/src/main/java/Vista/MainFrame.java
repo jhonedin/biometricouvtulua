@@ -90,6 +90,45 @@ public class MainFrame extends javax.swing.JFrame {
         btnCerrar.setForeground(Color.WHITE);
         btnCerrar.setFocusPainted(false);
         
+        //Agrego Actionlistener al boton Verificar Huella
+        btnVerificarHuella.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Crear y mostrar el nuevo JFrame
+                JFrame newFrame = new JFrame("Verificación de huella biometrica");
+                newFrame.setSize(400, 300);
+                newFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+                // Crear un JLabel en el nuevo JFrame
+                JLabel newLabel = new JLabel("Este es el nuevo JFrame");
+                newLabel.setBounds(100, 100, 200, 30);
+                newFrame.add(newLabel);
+
+                newFrame.setLayout(null); // Establecer el diseño nulo para usar setBounds
+                newFrame.setVisible(true);
+            }
+        });
+        
+        //Agrego Actionlistener al boton Registrar Nuevo
+        btnRegistrarHuella.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Crear y mostrar el nuevo JFrame
+                JFrame newFrame = new JFrame("Enrolar nuevo usuario");
+                newFrame.setSize(400, 300);
+                newFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+                // Crear un JLabel en el nuevo JFrame
+                JLabel newLabel = new JLabel("Este es el nuevo JFrame");
+                newLabel.setBounds(100, 100, 200, 30);
+                newFrame.add(newLabel);
+
+                newFrame.setLayout(null); // Establecer el diseño nulo para usar setBounds
+                newFrame.setVisible(true);
+            }
+        });
+        
+        
         // Agregar ActionListener al botón cerrar
         btnCerrar.addActionListener(new ActionListener() {
             @Override

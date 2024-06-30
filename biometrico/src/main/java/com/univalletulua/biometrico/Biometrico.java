@@ -26,7 +26,7 @@ public class Biometrico extends JFrame {
    
     public static void main (String[] args) {
         System.out.println("HOLA JHON EDINSON");
-        
+        /*
         Docente docente = new Docente();
         
         docente.setCedula("14890711");
@@ -39,17 +39,16 @@ public class Biometrico extends JFrame {
         docente.setActivo("S");
         DocenteDAO docenteNew = new DocenteDAO();
         //docenteNew.agregarDocente(docente);
-        
         docente.setActivo("S");
-
         docenteNew.actualizarDocente(docente);
-       /*
+        */
+       
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MainFrame().setVisible(true);
             }
         });
-        */
+        
     }
     
 }

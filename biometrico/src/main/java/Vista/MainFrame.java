@@ -1,10 +1,5 @@
 package Vista;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +22,12 @@ public class MainFrame extends javax.swing.JFrame {
     private JButton btnRegistrarHuella;
     private JLabel labelMensaje;
     private JLabel relojLabel;
+    private JButton btnConfiguracion;
     private JButton btnCerrar;
+    
+    
+    
+    
     /**
      * Creates new form MainFrame
      */
@@ -68,7 +68,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnVerificarHuella.setBounds(710,280, 300, 50);
         btnVerificarHuella.setFont(new Font("Arial", Font.BOLD, 26));
         // Arreglo los parametros del boton de registrar huella
-        btnRegistrarHuella = new JButton("Registrar Nuevo");
+        btnRegistrarHuella = new JButton("Nuevo Usuario");
         btnRegistrarHuella.setBounds(710,400, 300, 50);
         btnRegistrarHuella.setFont(new Font("Arial", Font.BOLD, 26));
         // Arreglo los parametros del label del mensaje de para un nuevo registro
@@ -83,6 +83,12 @@ public class MainFrame extends javax.swing.JFrame {
         relojLabel.setForeground(Color.RED);
         relojLabel.setFont(new Font("Arial", Font.BOLD, 20));
         relojLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Arreglo los ajustes del boton configuracion
+        btnConfiguracion = new JButton("Configuración");
+        btnConfiguracion.setBounds(1120,550, 150, 30);
+        btnConfiguracion.setBackground(Color.GREEN);
+        btnConfiguracion.setForeground(Color.WHITE);
+        btnConfiguracion.setFocusPainted(false);
         // Arreglo los ajustes del boton de cerrar el frame y terminar programa
         btnCerrar = new JButton("Cerrar");
         btnCerrar.setBounds(1120,620, 150, 30);
@@ -90,22 +96,32 @@ public class MainFrame extends javax.swing.JFrame {
         btnCerrar.setForeground(Color.WHITE);
         btnCerrar.setFocusPainted(false);
         
-        //Agrego Actionlistener al boton Verificar Huella
-        btnVerificarHuella.addActionListener(new ActionListener() {
+        // Agrego ActionListener al boton Configuraciones.
+        btnConfiguracion.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Crear y mostrar el nuevo JFrame
-                JFrame newFrame = new JFrame("Verificación de huella biometrica");
-                newFrame.setSize(400, 300);
+                JFrame newFrame = new JFrame("Configuracion");
+                newFrame.setSize(700, 500);
                 newFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
                 // Crear un JLabel en el nuevo JFrame
-                JLabel newLabel = new JLabel("Este es el nuevo JFrame");
-                newLabel.setBounds(100, 100, 200, 30);
+                JLabel newLabel = new JLabel("Este es el Frame de Configuraciones");
+                newLabel.setBounds(100, 300, 200, 100);
                 newFrame.add(newLabel);
 
                 newFrame.setLayout(null); // Establecer el diseño nulo para usar setBounds
                 newFrame.setVisible(true);
+            }
+        });
+        
+        //Agrego Actionlistener al boton Verificar Huella
+        btnVerificarHuella.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                VerificarHuellaFrame verificarHuella = new VerificarHuellaFrame();
+                verificarHuella.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                verificarHuella.setVisible(true);
             }
         });
         
@@ -160,6 +176,7 @@ public class MainFrame extends javax.swing.JFrame {
         panelMainFrame.add(labelMensaje);
         panelMainFrame.add(relojLabel);
         panelMainFrame.add(btnCerrar);
+        panelMainFrame.add(btnConfiguracion);
         
         // Agregar el panel al marco
         this.add(panelMainFrame);

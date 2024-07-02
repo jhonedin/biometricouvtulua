@@ -129,18 +129,9 @@ public class MainFrame extends javax.swing.JFrame {
         btnRegistrarHuella.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Crear y mostrar el nuevo JFrame
-                JFrame newFrame = new JFrame("Enrolar nuevo usuario");
-                newFrame.setSize(400, 300);
-                newFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-                // Crear un JLabel en el nuevo JFrame
-                JLabel newLabel = new JLabel("Este es el nuevo JFrame");
-                newLabel.setBounds(100, 100, 200, 30);
-                newFrame.add(newLabel);
-
-                newFrame.setLayout(null); // Establecer el diseño nulo para usar setBounds
-                newFrame.setVisible(true);
+                NuevoUsuarioFrame nuevousuario  = new NuevoUsuarioFrame();
+                nuevousuario.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                nuevousuario.setVisible(true);
             }
         });
         

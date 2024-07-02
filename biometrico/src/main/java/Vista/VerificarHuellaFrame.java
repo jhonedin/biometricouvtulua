@@ -60,9 +60,29 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         
         // Ajusto los parametros del JLabel horaEntrada
         horaEntradaLabel = new JLabel("Hora Entrada:");
-        horaEntradaLabel.setBounds(330,190,300, 20);
+        horaEntradaLabel.setBounds(330,200,300, 20);
         horaEntradaLabel.setForeground(Color.RED);
         horaEntradaLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        
+        // Ajusto los parametros del campo de texto JTextField horaEntrada
+        horaEntrada = new JTextField();
+        horaEntrada.setBounds(460,190, 150, 40);
+        horaEntrada.setFont(new Font("Arial", Font.BOLD, 16));
+        horaEntrada.setText(getHoraEntradaDocenteIdentificado());
+        horaEntrada.setEditable(false);
+        
+        // Ajusto los parametros del JLabel horaSalida
+        horaSalidaLabel = new JLabel("Hora Salida:");
+        horaSalidaLabel.setBounds(330,270,300, 20);
+        horaSalidaLabel.setForeground(Color.RED);
+        horaSalidaLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        
+        // Ajusto los parametros del campo de texto JTextField horaSalida
+        horaSalida = new JTextField();
+        horaSalida.setBounds(460,260, 150, 40);
+        horaSalida.setFont(new Font("Arial", Font.BOLD, 16));
+        horaSalida.setText(getHoraSalidaDocenteIdentificado());
+        horaSalida.setEditable(false);
         
         // Ajusto los parametros del boton de cerrar
         cerrarButton = new JButton("Cerrar");
@@ -80,6 +100,9 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         panelVerificarHuella.add(cerrarButton);
         panelVerificarHuella.add(docenteIdentificado);
         panelVerificarHuella.add(horaEntradaLabel);
+        panelVerificarHuella.add(horaSalidaLabel);
+        panelVerificarHuella.add(horaEntrada);
+        panelVerificarHuella.add(horaSalida);
         
         // Agregar el panel al marco
         this.add(panelVerificarHuella);
@@ -92,6 +115,14 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
     
     public String getNombreDocenteIdentificado(){
         return "JHON EDINSON BLANDON QUINTERO";
+    }
+    
+    public String getHoraEntradaDocenteIdentificado(){
+        return "NO REGISTRADO";
+    }
+    
+    public String getHoraSalidaDocenteIdentificado(){
+        return "NO REGISTRADO";
     }
 
     /**

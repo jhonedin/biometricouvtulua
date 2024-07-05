@@ -9,10 +9,11 @@ public class ProgramaDAO {
 
     public boolean agregarPrograma(Programa programa) {
         Connection conn = conexion.getConnection();
-        String sql = "INSERT INTO programas (idprograma, nombreprograma) VALUES (?, ?)";
+        String sql = "INSERT INTO programas (idprograma, nombreprograma, activo) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, programa.getIdPrograma());
             stmt.setString(2, programa.getNombrePrograma());
+            stmt.setString(3, programa.getActivoPrograma());
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -32,6 +33,7 @@ public class ProgramaDAO {
                 Programa programa = new Programa();
                 programa.setIdPrograma(rs.getString("idprograma"));
                 programa.setNombrePrograma(rs.getString("nombreprograma"));
+                programa.setNombrePrograma(rs.getString("activo"));
                 lista.add(programa);
             }
         } catch (SQLException e) {
@@ -44,10 +46,11 @@ public class ProgramaDAO {
 
     public boolean actualizarPrograma(Programa programa) {
         Connection conn = conexion.getConnection();
-        String sql = "UPDATE programas SET nombreprograma = ? WHERE idprograma = ?";
+        String sql = "UPDATE programas SET nombreprograma,activo = ? WHERE idprograma = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, programa.getNombrePrograma());
-            stmt.setString(2, programa.getIdPrograma());
+            stmt.setString(2, programa.getActivoPrograma());
+            stmt.setString(3, programa.getIdPrograma());
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) {

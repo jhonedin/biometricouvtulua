@@ -6,12 +6,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Conexion {
-    private static String URL = "jdbc:mysql://192.168.14.85:3306/biometrico";
-    private static String USER = "biometrico";
-    private static String PASSWORD = "univalle**";
-    //private static  String URL = "jdbc:mysql://localhost:3306/biometrico";
-    //private static  String USER = "biometrico";
-    //private static  String PASSWORD = "univalle**";
+    //private static String URL = "jdbc:mysql://192.168.14.85:3306/biometrico";
+    //private static String USER = "biometrico";
+    //private static String PASSWORD = "univalle**";
+    private static  String URL = "jdbc:mysql://localhost:3306/biometrico";
+    private static  String USER = "biometrico";
+    private static  String PASSWORD = "univalle**";
     
     private Connection connection = null;
 

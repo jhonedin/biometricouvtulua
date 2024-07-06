@@ -55,6 +55,36 @@ public class DocenteDAO {
         }
         return lista;
     }
+    
+    public Docente obtenerDocentePorCedula(String cedula) {
+        Docente docente = null;
+        String sql = "SELECT * FROM docentes WHERE cedula = ?";
+        
+        try (Connection conn = conexion.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, cedula);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    docente = new Docente();
+                    docente.setCedula(rs.getString("cedula"));
+                    docente.setPrimerNombre(rs.getString("primernombre"));
+                    docente.setSegundoNombre(rs.getString("segundonombre"));
+                    docente.setPrimerApellido(rs.getString("primerapellido"));
+                    docente.setSegundoApellido(rs.getString("segundoapellido"));
+                    docente.setCorreo(rs.getString("correo"));
+                    docente.setTelefono(rs.getString("telefono"));
+                    docente.setIdPrograma(rs.getString("idprograma"));
+                    docente.setActivo(rs.getString("activo"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener docente por cédula: " + e.getMessage());
+        }
+        
+        return docente;
+    }
 
     public boolean actualizarDocente(Docente docente) {
         Connection conn = conexion.getConnection();

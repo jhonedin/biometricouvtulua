@@ -1,5 +1,7 @@
 package Vista;
 
+import Modelo.Docente;
+import Modelo.DocenteDAO;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -119,10 +121,27 @@ public class MainFrame extends javax.swing.JFrame {
         btnVerificarHuella.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                VerificarHuellaFrame verificarHuella = new VerificarHuellaFrame();
-                verificarHuella.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                verificarHuella.setVisible(true);
-            }
+                // Verificación de si el campo de texto está vacío
+                if (textFieldCedula.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(MainFrame.this, "Ingrese la cédula", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                    return; // Salir del método si la cédula no está proporcionada
+                }
+                // se verifica que la cedula del docente este registrada en la BD
+                Docente docente = new Docente();
+                DocenteDAO docentedao = new DocenteDAO();
+                docente = docentedao.obtenerDocentePorCedula(textFieldCedula.getText().toString());
+                // Verificación adicional para evitar NullPointerException
+                if (docente != null && docente.getCedula() != null) {
+                    VerificarHuellaFrame verificarHuella = new VerificarHuellaFrame(textFieldCedula.getText().toString());
+                    verificarHuella.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    verificarHuella.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this, "Cédula no registrada", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } 
+                
+                
+        
         });
         
         //Agrego Actionlistener al boton Registrar Nuevo

@@ -11,7 +11,7 @@ public class RegistroAsistenciaDAO {
         Connection conn = conexion.getConnection();
         String sql = "INSERT INTO registrosasistencia (cedula, horaingreso, horasalida) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, registro.getCedula());
+            stmt.setString(1,registro.getCedula());
             stmt.setTimestamp(2, registro.getHoraIngreso());
             stmt.setTimestamp(3, registro.getHoraSalida());
             stmt.executeUpdate();
@@ -77,5 +77,62 @@ public class RegistroAsistenciaDAO {
             conexion.closeConnection();
         }
     }
+    
+    public List<RegistroAsistencia> getAsistenciasPorRangoDeFechas(Date fechaInicial, Date fechaFinal) {
+    List<RegistroAsistencia> asistencias = new ArrayList<>();
+    String sql = "SELECT * FROM RegistroAsistencia WHERE fecha BETWEEN ? AND ?";
+    try (Connection conn = conexion.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setTimestamp(1, new java.sql.Timestamp(fechaInicial.getTime()));
+        stmt.setTimestamp(2, new java.sql.Timestamp(fechaFinal.getTime()));
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            RegistroAsistencia asistencia = new RegistroAsistencia();
+            asistencia.setIdRegistro(rs.getInt("idregistro"));
+            //asistencia.setFecha(rs.getDate("fecha"));
+            asistencia.setHoraIngreso(rs.getTimestamp("horaingreso"));
+            asistencia.setHoraSalida(rs.getTimestamp("horasalida"));
+            asistencia.setCedula(rs.getString("cedula"));
+            asistencias.add(asistencia);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+        return asistencias;
+    }
+
+    public Timestamp getHoraEntradaActual(String cedulaDocente) {
+    String sql = "SELECT horaingreso FROM RegistroAsistencia WHERE docenteCedula = ? AND fecha = CURDATE()";
+    try (Connection conn = conexion.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, cedulaDocente);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getTimestamp("horaingreso");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+        return null;
+    }
+    
+    public Timestamp getHoraSalidaActual(String cedulaDocente) {
+    String sql = "SELECT horasalida FROM RegistroAsistencia WHERE docenteCedula = ? AND fecha = CURDATE()";
+    try (Connection conn = conexion.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, cedulaDocente);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getTimestamp("horasalida");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+        return null;
+    }
+    
+    
+    
+
 }
 

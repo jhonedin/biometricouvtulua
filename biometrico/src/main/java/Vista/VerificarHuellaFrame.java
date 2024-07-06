@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import Modelo.DocenteDAO;
 
 public class VerificarHuellaFrame extends javax.swing.JFrame {
     private JLabel tituloLabel;
@@ -22,7 +23,11 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
     private JTextField horaEntrada;
     private JTextField horaSalida;
     
-    public VerificarHuellaFrame() {
+    public VerificarHuellaFrame(){
+    
+    }
+    
+    public VerificarHuellaFrame(String cedula) {
         this.setSize(800,600);
         this.setResizable(false);
         this.setTitle("VERIFICAR HUELLA");
@@ -55,7 +60,7 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         docenteIdentificado = new JTextField();
         docenteIdentificado.setBounds(420,120, 330, 40);
         docenteIdentificado.setFont(new Font("Arial", Font.BOLD, 16));
-        docenteIdentificado.setText(getNombreDocenteIdentificado());
+        docenteIdentificado.setText(getNombreDocenteIdentificado(cedula));
         docenteIdentificado.setEditable(false);
         
         // Ajusto los parametros del JLabel horaEntrada
@@ -113,8 +118,16 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         initComponents();
     }
     
-    public String getNombreDocenteIdentificado(){
-        return "JHON EDINSON BLANDON QUINTERO";
+    public String getNombreDocenteIdentificado(String cedula){
+        DocenteDAO docentedao = new DocenteDAO();
+        String primerNombre = docentedao.obtenerDocentePorCedula(cedula).getPrimerNombre();
+        String segundoNombre = docentedao.obtenerDocentePorCedula(cedula).getSegundoNombre();
+        if(segundoNombre==null){
+            segundoNombre = "";
+        }
+        String primerApellido = docentedao.obtenerDocentePorCedula(cedula).getPrimerApellido();
+        String segundoApellido = docentedao.obtenerDocentePorCedula(cedula).getSegundoApellido();
+        return primerNombre+" "+segundoNombre+" "+primerApellido+" "+segundoApellido;
     }
     
     public String getHoraEntradaDocenteIdentificado(){

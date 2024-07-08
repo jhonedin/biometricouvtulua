@@ -365,6 +365,10 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
             return false;
         }
     }    
+    
+    public void cargarProgramas(){
+        
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

@@ -33,7 +33,7 @@ public class ProgramaDAO {
                 Programa programa = new Programa();
                 programa.setIdPrograma(rs.getString("idprograma"));
                 programa.setNombrePrograma(rs.getString("nombreprograma"));
-                programa.setNombrePrograma(rs.getString("activo"));
+                programa.setActivoPrograma(rs.getString("activo"));
                 lista.add(programa);
             }
         } catch (SQLException e) {

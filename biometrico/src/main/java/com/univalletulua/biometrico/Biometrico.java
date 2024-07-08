@@ -20,12 +20,6 @@ public class Biometrico extends JFrame {
    
     public static void main (String[] args) {
         System.out.println("HOLA JHON EDINSON");
-        ProgramaDAO programadao = new ProgramaDAO();
-        List<Programa> listaProgramas = programadao.obtenerProgramas();
-        for(Programa programas : listaProgramas){
-            System.out.println(programas.getNombrePrograma());
-        }
-        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MainFrame().setVisible(true);

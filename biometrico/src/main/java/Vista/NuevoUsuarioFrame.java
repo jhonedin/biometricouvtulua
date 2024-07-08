@@ -3,11 +3,14 @@ import Modelo.AdministradoresDAO;
 import Modelo.Administradores;
 import Modelo.Docente;
 import Modelo.DocenteDAO;
+import Modelo.Programa;
+import Modelo.ProgramaDAO;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -22,6 +25,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
     
     private CardLayout cardLayout;
     private JPanel mainPanel;
+    private JComboBox<String> programaComboBox;
     
     public NuevoUsuarioFrame() {
         this.setSize(900,600);
@@ -230,7 +234,9 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         programaLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JComboBox programaComboBox
-        JComboBox<String> programaComboBox = new JComboBox<>(new String[]{"2725-TECNOLOGIA EN ELECTRONICA INDUSTRIAL", "3743-INGENIERIA DE SISTEMAS"});
+        //JComboBox<String> programaComboBox = new JComboBox<>(new String[]{"2725-TECNOLOGIA EN ELECTRONICA INDUSTRIAL", "3743-INGENIERIA DE SISTEMAS"});
+        programaComboBox = new JComboBox();
+        cargarProgramas();
         programaComboBox.setBounds(515,245,280, 30);
         programaComboBox.setBackground(Color.WHITE);
         programaComboBox.setFont(new Font("Arial", Font.BOLD, 10));
@@ -366,8 +372,17 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         }
     }    
     
-    public void cargarProgramas(){
+    public void cargarProgramas() {
+        ProgramaDAO programaDAO = new ProgramaDAO();
+        List<Programa> programas = programaDAO.obtenerProgramas();
         
+        programaComboBox.removeAllItems();
+        
+        for (Programa programa : programas) {
+            if ("S".equals(programa.getActivoPrograma())) {
+                programaComboBox.addItem(programa.getNombrePrograma());
+            }
+        }
     }
 
     /**

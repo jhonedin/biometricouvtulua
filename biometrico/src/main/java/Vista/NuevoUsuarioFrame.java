@@ -1,6 +1,8 @@
 package Vista;
 import Modelo.AdministradoresDAO;
 import Modelo.Administradores;
+import Modelo.Docente;
+import Modelo.DocenteDAO;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -291,6 +293,31 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         
         // Agregar ActionListener al botón cerrar
         cerrarButton.addActionListener(ev -> this.dispose());
+        
+        consultarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String cedula = cedulaField.getText();
+                DocenteDAO docenteDAO = new DocenteDAO();
+                Docente docente = docenteDAO.obtenerDocentePorCedula(cedula);
+
+                if (docente == null) {
+                    JOptionPane.showMessageDialog(null, "Docente no registrado");
+                } else if ("N".equals(docente.getActivo())) {
+                    JOptionPane.showMessageDialog(null, "Docente no registrado");
+                } else {
+                    // Llenar campos con información del docente
+                    primerNombreField.setText(docente.getPrimerNombre());
+                    segundoNombreField.setText(docente.getSegundoNombre());
+                    primerApellidoField.setText(docente.getPrimerApellido());
+                    segundoApellidoField.setText(docente.getSegundoApellido());
+                    correoField.setText(docente.getCorreo());
+                    telefonoField.setText(docente.getTelefono());
+                    programaComboBox.setSelectedItem(docente.getIdPrograma());
+                    activoComboBox.setSelectedItem("S".equals(docente.getActivo()) ? "SI" : "NO");
+                }
+            }
+        });
         
         panelRegistro.add(tituloLabel);
         panelRegistro.add(subtituloLabel);

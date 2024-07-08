@@ -139,9 +139,6 @@ public class MainFrame extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(MainFrame.this, "Cédula no registrada", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } 
-                
-                
-        
         });
         
         //Agrego Actionlistener al boton Registrar Nuevo

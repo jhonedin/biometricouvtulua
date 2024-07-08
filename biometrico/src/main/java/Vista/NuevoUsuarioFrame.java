@@ -1,12 +1,11 @@
 package Vista;
 import Modelo.AdministradoresDAO;
+import Modelo.Administradores;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -327,8 +326,17 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
     }
 
     private boolean validateLogin(String username, String password) {
-        // Validación de usuario y contraseña (simulada)
-        return "admin".equals(username) && "password".equals(password);
+        AdministradoresDAO administrador = new AdministradoresDAO();
+        Administradores adminValidado = new Administradores();
+        String nombreAdministrador = null;
+        if(administrador.autenticarAdministrador(username, password)){
+            adminValidado = administrador.obtenerAdministradorPorId(username);
+            nombreAdministrador = adminValidado.getNombre();
+            JOptionPane.showMessageDialog(null, "Usted se ha autenticado como: " + nombreAdministrador);
+            return true;
+        } else {
+            return false;
+        }
     }    
 
     /**

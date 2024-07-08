@@ -30,6 +30,27 @@ public class AdministradoresDAO {
         return lista;
     }
      
+    public Administradores obtenerAdministradorPorId(String id) {
+        Administradores administrador = null;
+        Connection conn = conexion.getConnection();
+        String sql = "SELECT * FROM administradores WHERE idadministrador = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                administrador = new Administradores();
+                administrador.setIdAdministrador(rs.getString("idadministrador"));
+                administrador.setNombre(rs.getString("nombre"));
+                administrador.setPassword(rs.getString("password"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener administrador por ID: " + e.getMessage());
+        } finally {
+            conexion.closeConnection();
+        }
+        return administrador;
+    }     
+     
     public boolean autenticarAdministrador(String id, String password) {
         Connection conn = conexion.getConnection();
         String sql = "SELECT password FROM administradores WHERE idadministrador = ?";

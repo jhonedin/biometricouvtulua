@@ -138,6 +138,10 @@ public class MainFrame extends javax.swing.JFrame {
                 } else {
                     JOptionPane.showMessageDialog(MainFrame.this, "Cédula no registrada", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+                /*
+                else if ("N".equals(docente.getActivo())) {
+                    JOptionPane.showMessageDialog(null, "Docente no registrado");
+                */
             } 
         });
         

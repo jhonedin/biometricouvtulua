@@ -25,7 +25,18 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
     
     private CardLayout cardLayout;
     private JPanel mainPanel;
+    
+    JTextField cedulaField;
+    JTextField primerNombreField;
+    JTextField segundoNombreField;
+    JTextField primerApellidoField;
+    JTextField segundoApellidoField;
+    JTextField correoField;
+    JTextField telefonoField;
+    JComboBox<String> activoComboBox;
     private JComboBox<String> programaComboBox;
+    private Programa programa;
+    
     
     public NuevoUsuarioFrame() {
         this.setSize(900,600);
@@ -157,7 +168,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         cedulaLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JTextField cedulaField
-        JTextField cedulaField = new JTextField();
+        cedulaField = new JTextField();
         cedulaField.setBounds(165,145,200,30);
         cedulaField.setFont(new Font("Arial", Font.BOLD, 16));
         
@@ -168,7 +179,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         primerNombreLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JTextField primerNombreField
-        JTextField primerNombreField = new JTextField();
+        primerNombreField = new JTextField();
         primerNombreField.setBounds(165,195,200,30);
         primerNombreField.setFont(new Font("Arial", Font.BOLD, 16));
         
@@ -179,7 +190,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         segundoNombreLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JTextField primerNombreField
-        JTextField segundoNombreField = new JTextField();
+        segundoNombreField = new JTextField();
         segundoNombreField.setBounds(165,245,200,30);
         segundoNombreField.setFont(new Font("Arial", Font.BOLD, 16));
         
@@ -190,7 +201,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         primerApellidoLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JTextField primerApellidoField
-        JTextField primerApellidoField = new JTextField();
+        primerApellidoField = new JTextField();
         primerApellidoField.setBounds(165,295,200,30);
         primerApellidoField.setFont(new Font("Arial", Font.BOLD, 16));
         
@@ -201,7 +212,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         segundoApellidoLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JTextField segundoApellidoField
-        JTextField segundoApellidoField = new JTextField();
+        segundoApellidoField = new JTextField();
         segundoApellidoField.setBounds(165,345,200,30);
         segundoApellidoField.setFont(new Font("Arial", Font.BOLD, 16));
         
@@ -212,7 +223,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         correoLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JTextField correoField
-        JTextField correoField = new JTextField();
+        correoField = new JTextField();
         correoField.setBounds(515,145,280,30);
         correoField.setFont(new Font("Arial", Font.BOLD, 14));
         
@@ -223,7 +234,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         telefonoLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JTextField telefonoField
-        JTextField telefonoField = new JTextField();
+        telefonoField = new JTextField();
         telefonoField.setBounds(515,195,280,30);
         telefonoField.setFont(new Font("Arial", Font.BOLD, 16));
         
@@ -232,11 +243,9 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         programaLabel.setBounds(428,250,200, 20);
         programaLabel.setForeground(Color.RED);
         programaLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        
-        // Ajusto los parametros del JComboBox programaComboBox
-        //JComboBox<String> programaComboBox = new JComboBox<>(new String[]{"2725-TECNOLOGIA EN ELECTRONICA INDUSTRIAL", "3743-INGENIERIA DE SISTEMAS"});
+       
         programaComboBox = new JComboBox();
-        cargarProgramas();
+        cargarProgramas(); // se cargan los programas automaticamente desde la base de datos, en el JComboBox.
         programaComboBox.setBounds(515,245,280, 30);
         programaComboBox.setBackground(Color.WHITE);
         programaComboBox.setFont(new Font("Arial", Font.BOLD, 10));
@@ -248,7 +257,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         activoLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JComboBox activoComboBox
-        JComboBox<String> activoComboBox = new JComboBox<>(new String[]{"SI", "NO"});
+        activoComboBox = new JComboBox<>(new String[]{"SI", "NO"});
         activoComboBox.setBounds(515,295,280, 30);
         activoComboBox.setBackground(Color.WHITE);
         activoComboBox.setFont(new Font("Arial", Font.BOLD, 16));
@@ -309,9 +318,8 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
 
                 if (docente == null) {
                     JOptionPane.showMessageDialog(null, "Docente no registrado");
-                } else if ("N".equals(docente.getActivo())) {
-                    JOptionPane.showMessageDialog(null, "Docente no registrado");
                 } else {
+                    if ("N".equals(docente.getActivo())) JOptionPane.showMessageDialog(null, "Docente No Activo");
                     // Llenar campos con información del docente
                     primerNombreField.setText(docente.getPrimerNombre());
                     segundoNombreField.setText(docente.getSegundoNombre());
@@ -319,9 +327,18 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
                     segundoApellidoField.setText(docente.getSegundoApellido());
                     correoField.setText(docente.getCorreo());
                     telefonoField.setText(docente.getTelefono());
-                    programaComboBox.setSelectedItem(docente.getIdPrograma());
-                    activoComboBox.setSelectedItem("S".equals(docente.getActivo()) ? "SI" : "NO");
+                    ProgramaDAO programaDAO = new ProgramaDAO();
+                    programa = programaDAO.obtenerProgramaPorId(docente.getIdPrograma());
+                    programaComboBox.setSelectedItem(programa.getNombrePrograma());
+                    activoComboBox.setSelectedItem("N".equals(docente.getActivo()) ? "NO" : "SI");
                 }
+            }
+        });
+        
+        registrarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                registrarDocente();
             }
         });
         
@@ -384,6 +401,52 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
             }
         }
     }
+    
+    private void registrarDocente() {
+        // Obtención de datos desde los campos de texto
+        String cedula = cedulaField.getText();
+        String primerNombre = primerNombreField.getText();
+        String segundoNombre = segundoNombreField.getText();
+        String primerApellido = primerApellidoField.getText();
+        String segundoApellido = segundoApellidoField.getText();
+        String correo = correoField.getText();
+        String telefono = telefonoField.getText();
+        String nombrePrograma = (String) programaComboBox.getSelectedItem();
+        String idPrograma = getIdPrograma(nombrePrograma);
+        String activo = (String) activoComboBox.getSelectedItem();
+
+        // Crear una instancia de Docente
+        Docente undocente = new Docente();
+        undocente.setCedula(cedula);
+        undocente.setPrimerNombre(primerNombre);
+        undocente.setSegundoNombre(segundoNombre);
+        undocente.setPrimerApellido(primerApellido);
+        undocente.setSegundoApellido(segundoApellido);
+        undocente.setCorreo(correo);
+        undocente.setTelefono(telefono);
+        undocente.setIdPrograma(idPrograma);
+        if("SI".equals(activo)) undocente.setActivo("S");
+        if("NO".equals(activo)) undocente.setActivo("N");
+        // Instancia de DocenteDAO para manejar la base de datos
+        DocenteDAO docenteDAO = new DocenteDAO();
+
+        // Verificar si el docente ya existe
+        if (docenteDAO.existeDocente(cedula)) {
+            JOptionPane.showMessageDialog(this, "El docente ya existe en la base de datos.");
+        } else {
+            // Intentar agregar el docente
+            if (docenteDAO.agregarDocente(undocente)) {
+                JOptionPane.showMessageDialog(this, "Docente registrado exitosamente.");
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al registrar el docente.");
+            }
+        }
+    }
+    
+    private String getIdPrograma(String nombrePrograma) {
+        ProgramaDAO programaDAO = new ProgramaDAO();
+        return programaDAO.getIdProgramaByName(nombrePrograma);
+    }    
 
     /**
      * This method is called from within the constructor to initialize the form.

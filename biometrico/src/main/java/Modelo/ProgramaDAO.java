@@ -43,6 +43,57 @@ public class ProgramaDAO {
         }
         return lista;
     }
+    
+    public Programa obtenerProgramaPorId(String idPrograma) {
+        String sql = "SELECT idprograma, nombreprograma, activo FROM programas WHERE idprograma = ?";
+        try (Connection conn = conexion.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, idPrograma);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Programa programa = new Programa();
+                    programa.setIdPrograma(rs.getString("idprograma"));
+                    programa.setNombrePrograma(rs.getString("nombreprograma"));
+                    programa.setActivoPrograma(rs.getString("activo"));
+                    return programa;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getIdProgramaByName(String nombrePrograma) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String idPrograma = null;
+
+        try {
+            conn = conexion.getConnection();
+            String sql = "SELECT idprograma FROM programas WHERE nombreprograma = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, nombrePrograma);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                idPrograma = rs.getString("idprograma");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return idPrograma;
+    }
 
     public boolean actualizarPrograma(Programa programa) {
         Connection conn = conexion.getConnection();

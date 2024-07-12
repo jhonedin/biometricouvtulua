@@ -6,8 +6,6 @@ import Modelo.DocenteDAO;
 import Modelo.Programa;
 import Modelo.ProgramaDAO;
 
-
-
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -23,6 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import Vista.RegistroHuellaForm;
 
 public class NuevoUsuarioFrame extends javax.swing.JFrame {
     
@@ -393,9 +393,12 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
                             doc.getPrimerNombre()+" "+
                             doc.getPrimerApellido()
                             );
-                    //MainForm mf = new MainForm();
-                    //mf.setVisible(true);
-                    //mf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    // Instanciar el formulario de registro de huella
+                    RegistroHuellaForm huellaForm = new RegistroHuellaForm(cedula);
+                    huellaForm.setVisible(true);
+                    huellaForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    //FingerprintRegistrationForm form = new FingerprintRegistrationForm(cedula);
+                    //form.setVisible(true);
                 } 
             }
         });

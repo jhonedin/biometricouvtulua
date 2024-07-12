@@ -1,4 +1,4 @@
-package com.digitalpersona.onetouch.sampleapp;
+package Logica;
 
 import com.digitalpersona.onetouch.DPFPFingerIndex;
 import com.digitalpersona.onetouch.DPFPTemplate;
@@ -76,3 +76,4 @@ public class SessionUserDatabaseFactory implements UserDatabase.Factory {
         }
     }
 }
+

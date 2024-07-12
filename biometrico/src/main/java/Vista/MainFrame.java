@@ -48,7 +48,8 @@ public class MainFrame extends javax.swing.JFrame {
         titulo.setForeground(Color.RED);
         titulo.setFont(new Font("Arial", Font.BOLD, 28));
         // Arreglo los parametros del logo de Univalle
-        ImageIcon iconUnivalle = new ImageIcon("imagenes/logounivalle.png");
+        //ImageIcon iconUnivalle = new ImageIcon("src/main/resources/imagenes/logounivalle.png");
+        ImageIcon iconUnivalle = new ImageIcon(MainFrame.class.getResource("/imagenes/logounivalle.png"));
         logoUnivalle = new JLabel(iconUnivalle);
         logoUnivalle.setBounds(150,160, 281,400);
         //Arreglo los parametros del label de la sede tulua

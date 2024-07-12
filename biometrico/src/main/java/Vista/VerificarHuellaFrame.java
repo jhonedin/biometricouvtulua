@@ -122,11 +122,14 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         DocenteDAO docentedao = new DocenteDAO();
         String primerNombre = docentedao.obtenerDocentePorCedula(cedula).getPrimerNombre();
         String segundoNombre = docentedao.obtenerDocentePorCedula(cedula).getSegundoNombre();
-        if(segundoNombre==null){
+        if(segundoNombre==null || "nan".equals(segundoNombre) ){
             segundoNombre = "";
         }
         String primerApellido = docentedao.obtenerDocentePorCedula(cedula).getPrimerApellido();
         String segundoApellido = docentedao.obtenerDocentePorCedula(cedula).getSegundoApellido();
+        if(segundoApellido==null || "nan".equals(segundoApellido) ){
+            segundoApellido = "";
+        }
         return primerNombre+" "+segundoNombre+" "+primerApellido+" "+segundoApellido;
     }
     

@@ -1,8 +1,13 @@
-package com.digitalpersona.onetouch.sampleapp;
+
+package Logica;
 
 import com.digitalpersona.onetouch.*;
+import java.sql.Timestamp;
+import Modelo.Huella;
+import Modelo.HuellaDAO;
 import com.digitalpersona.onetouch.capture.DPFPCapture;
 import com.digitalpersona.onetouch.capture.DPFPCapturePriority;
+import com.digitalpersona.onetouch.capture.event.DPFPDataAdapter;
 import com.digitalpersona.onetouch.capture.event.DPFPDataEvent;
 import com.digitalpersona.onetouch.capture.event.DPFPDataListener;
 import com.digitalpersona.onetouch.capture.event.DPFPReaderStatusAdapter;
@@ -40,8 +45,7 @@ public class ConsoleUserInterfaceFactory implements UserInterface.Factory {
     /**
      * Console-based UserInterface
      */
-    private static class ConsoleUserInterface 
-    	implements UserInterface 
+    private static class ConsoleUserInterface implements UserInterface 
     {
 
         /**
@@ -498,5 +502,66 @@ public class ConsoleUserInterfaceFactory implements UserInterface.Factory {
         private String fingerprintName(DPFPFingerIndex finger) {
         	return fingerNames.get(finger) + " fingerprint"; 
         }
+        
+        ///////////////////////////////////////////////////////////////
+        // CODIGO AGREGADO PARA INTERACTUAR CON LA BASE DE DATOS "biometrico"
+        private DPFPFeatureSet extractFeatures(DPFPSample sample, DPFPDataPurpose purpose) {
+            DPFPFeatureExtraction extractor = DPFPGlobal.getFeatureExtractionFactory().createFeatureExtraction();
+            try {
+                return extractor.createFeatureSet(sample, purpose);
+            } catch (DPFPImageQualityException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        
+        private void registrarHuella(String activeReader) {
+            try {
+                DPFPCapture capture = DPFPGlobal.getCaptureFactory().createCapture();
+                capture.addDataListener(new DPFPDataAdapter() {
+                    public void dataAcquired(final DPFPDataEvent e) {
+                        // Procesar y guardar la huella
+                        DPFPSample sample = e.getSample();
+                        DPFPFeatureSet features = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
+
+                        if (features != null) {
+                            try {
+                                System.out.println("La huella ha sido capturada.");
+                                
+                                // Crear la plantilla de huella directamente
+                                DPFPTemplate template = DPFPGlobal.getTemplateFactory().createTemplate();
+                                template.deserialize(features.serialize());
+
+                                // Guardar la huella en la base de datos
+                                Huella huella = new Huella();
+                                huella.setUserId(ShowDialog("Ingrese el ID del usuario:"));
+                                huella.setCedula(ShowDialog("Ingrese la cédula del usuario:"));
+                                huella.setHuella(template.serialize());
+                                huella.setFecha(new Timestamp(System.currentTimeMillis()));
+                                
+                                HuellaDAO huellaDAO = new HuellaDAO();
+                                if (huellaDAO.agregarHuella(huella)) {
+                                    System.out.println("La huella ha sido guardada en la base de datos.");
+                                } else {
+                                    System.out.println("Error al guardar la huella en la base de datos.");
+                                }
+                                
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                });
+
+                capture.startCapture();
+                System.out.println("Lector de huellas iniciado, coloque su dedo.");
+            } catch (RuntimeException e) {
+                System.out.printf("El lector no está disponible o está siendo utilizado por otra aplicación.\n");
+                throw e;
+            }
+        }
+        
+         
+        ////////////////////////////////////////////////////////////////
     }
 }

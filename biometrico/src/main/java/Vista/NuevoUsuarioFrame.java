@@ -5,6 +5,9 @@ import Modelo.Docente;
 import Modelo.DocenteDAO;
 import Modelo.Programa;
 import Modelo.ProgramaDAO;
+
+
+
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -59,7 +62,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         // Añadir el mainPanel al JFrame
         this.add(mainPanel);
         // Mostrar el panel de login al inicio
-        cardLayout.show(mainPanel, "LoginPanel");//cardLayout.show(mainPanel, "RegisterPanel");
+        cardLayout.show(mainPanel, "RegisterPanel"); //cardLayout.show(mainPanel, "LoginPanel");
        // Hacer visible el marco
         this.setVisible(true);
         initComponents();
@@ -306,12 +309,35 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         cerrarButton.setForeground(Color.WHITE);
         cerrarButton.setFocusPainted(false);
         
+        // Ajusto los parametros del JButton borrarCamposButton
+        JButton borrarCamposButton = new JButton("Borrar Campos");
+        borrarCamposButton.setBounds(650, 410, 150, 30); // Misma posición X que cerrarButton, 40px antes en Y
+        borrarCamposButton.setBackground(Color.ORANGE);
+        borrarCamposButton.setFont(new Font("Arial", Font.BOLD, 13));
+        borrarCamposButton.setFocusPainted(false);
+        
         // Agregar ActionListener al botón cerrar
         cerrarButton.addActionListener(ev -> this.dispose());
         
-        consultarButton.addActionListener(new ActionListener() {
+        // ActionListener para el botón borrarCamposButton
+        borrarCamposButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                cedulaField.setText("");
+                primerNombreField.setText("");
+                segundoNombreField.setText("");
+                primerApellidoField.setText("");
+                segundoApellidoField.setText("");
+                correoField.setText("");
+                telefonoField.setText("");
+                programaComboBox.setSelectedIndex(0);
+                activoComboBox.setSelectedIndex(0);
+            }
+         });    
+        
+        consultarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {               
                 String cedula = cedulaField.getText();
                 DocenteDAO docenteDAO = new DocenteDAO();
                 Docente docente = docenteDAO.obtenerDocentePorCedula(cedula);
@@ -339,6 +365,38 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 registrarDocente();
+            }
+        });
+        
+        // ActionListener para el botón modificar
+        modificarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                modificarDocente();
+            }
+        });
+        
+        // ActionListener para el botón enrollar la huella
+        enrolarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String cedula = cedulaField.getText().toString();
+                DocenteDAO docdao = new DocenteDAO();
+                Docente doc = new Docente();
+                doc = docdao.obtenerDocentePorCedula(cedula);
+                if(cedula.isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Docente no identificado no se puede Enrolar Huella");
+                    return;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Enrolar huella para el docente: "+
+                            doc.getCedula()+" "+
+                            doc.getPrimerNombre()+" "+
+                            doc.getPrimerApellido()
+                            );
+                    //MainForm mf = new MainForm();
+                    //mf.setVisible(true);
+                    //mf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                } 
             }
         });
         
@@ -370,6 +428,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         panelRegistro.add(modificarButton);
         panelRegistro.add(enrolarButton);
         panelRegistro.add(cerrarButton);
+        panelRegistro.add(borrarCamposButton);
         
         return panelRegistro;
        
@@ -403,6 +462,12 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
     }
     
     private void registrarDocente() {
+        // Validar que el campo cedula no esté vacío
+        String cedulavalidacion = cedulaField.getText().trim();
+        if (cedulavalidacion.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Error: el campo cédula no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         // Obtención de datos desde los campos de texto
         String cedula = cedulaField.getText();
         String primerNombre = primerNombreField.getText();
@@ -441,12 +506,57 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Error al registrar el docente.");
             }
         }
+       
     }
     
     private String getIdPrograma(String nombrePrograma) {
         ProgramaDAO programaDAO = new ProgramaDAO();
         return programaDAO.getIdProgramaByName(nombrePrograma);
-    }    
+    }
+
+    //////////////////////
+    private void modificarDocente() {
+        // Validar que el campo cedula no esté vacío
+        String cedulavalidacion = cedulaField.getText().trim();
+        if (cedulavalidacion.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Error: el campo cédula no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        // Obtención de datos desde los campos de texto
+        String cedula = cedulaField.getText();
+        String primerNombre = primerNombreField.getText();
+        String segundoNombre = segundoNombreField.getText();
+        String primerApellido = primerApellidoField.getText();
+        String segundoApellido = segundoApellidoField.getText();
+        String correo = correoField.getText();
+        String telefono = telefonoField.getText();
+        String nombrePrograma = (String) programaComboBox.getSelectedItem();
+        String idPrograma = getIdPrograma(nombrePrograma);
+        String activo = (String) activoComboBox.getSelectedItem();
+
+        // Crear una instancia de Docente
+        Docente docente = new Docente();
+        docente.setCedula(cedula);
+        docente.setPrimerNombre(primerNombre);
+        docente.setSegundoNombre(segundoNombre);
+        docente.setPrimerApellido(primerApellido);
+        docente.setSegundoApellido(segundoApellido);
+        docente.setCorreo(correo);
+        docente.setTelefono(telefono);
+        docente.setIdPrograma(idPrograma);
+        docente.setActivo("SI".equals(activo) ? "S" : "N");
+
+        // Instancia de DocenteDAO para manejar la base de datos
+        DocenteDAO docenteDAO = new DocenteDAO();
+
+        // Intentar actualizar el docente
+        if (docenteDAO.actualizarDocente(docente)) {
+            JOptionPane.showMessageDialog(this, "Docente actualizado exitosamente.");
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al actualizar el docente.");
+        }
+    }
+    //////////////////////
 
     /**
      * This method is called from within the constructor to initialize the form.

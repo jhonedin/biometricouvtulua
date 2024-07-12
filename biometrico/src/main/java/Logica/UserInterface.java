@@ -1,4 +1,4 @@
-package com.digitalpersona.onetouch.sampleapp;
+package Logica;
 
 /**
  * Abstract user interface

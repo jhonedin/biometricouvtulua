@@ -114,7 +114,7 @@ public class DocenteDAO {
 
     public boolean actualizarDocente(Docente docente) {
         Connection conn = conexion.getConnection();
-        String sql = "UPDATE docente SET primernombre = ?, segundonombre = ?, primerapellido = ?, segundoapellido = ?, correo = ?, telefono = ?, idprograma = ?, activo = ? WHERE cedula = ?";
+        String sql = "UPDATE docentes SET primernombre = ?, segundonombre = ?, primerapellido = ?, segundoapellido = ?, correo = ?, telefono = ?, idprograma = ?, activo = ? WHERE cedula = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, docente.getPrimerNombre());
             stmt.setString(2, docente.getSegundoNombre());

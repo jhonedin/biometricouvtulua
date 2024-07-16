@@ -94,7 +94,7 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
             @Override public void componentHidden(ComponentEvent e) {
                 stop();
             }
-        });
+        });  
         
         pack();
         setLocationRelativeTo(null);        
@@ -157,11 +157,23 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
                 huella.setFecha(new Timestamp(System.currentTimeMillis()));
                 
                 HuellaDAO huellaDAO = new HuellaDAO();
+                if (huellaDAO.obtenerHuellaPorId(huella.getUserId()) != null) {
+                    JOptionPane.showMessageDialog(this,huella.getUserId()+" : "+"Esta huella ya está registrada.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (huellaDAO.agregarHuella(huella)) {
+                        makeReport("The fingerprint has been saved to the database.");
+                         JOptionPane.showMessageDialog(this,"Huella registrada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        makeReport("Error saving the fingerprint to the database.");
+                    }
+                }
+                /*
                 if (huellaDAO.agregarHuella(huella)) {
                     makeReport("The fingerprint has been saved to the database.");
                 } else {
                     makeReport("Error saving the fingerprint to the database.");
                 }
+                */
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

@@ -45,6 +45,28 @@ public class HuellaDAO {
         }
         return lista;
     }
+    
+    public Huella obtenerHuellaPorId(String userId) {
+        Connection conn = conexion.getConnection();
+        String sql = "SELECT * FROM huellas WHERE userid = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Huella huella = new Huella();
+                huella.setUserId(rs.getString("userid"));
+                huella.setCedula(rs.getString("cedula"));
+                huella.setHuella(rs.getBytes("huella"));
+                huella.setFecha(rs.getTimestamp("fecha"));
+                return huella;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener huella: " + e.getMessage());
+        } finally {
+            conexion.closeConnection();
+        }
+        return null;
+    }    
 
     public boolean actualizarHuella(Huella huella) {
         Connection conn = conexion.getConnection();

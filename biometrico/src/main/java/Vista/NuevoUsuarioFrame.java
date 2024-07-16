@@ -62,7 +62,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         // Añadir el mainPanel al JFrame
         this.add(mainPanel);
         // Mostrar el panel de login al inicio
-        cardLayout.show(mainPanel, "RegisterPanel"); //cardLayout.show(mainPanel, "LoginPanel");
+        cardLayout.show(mainPanel, "LoginPanel");//cardLayout.show(mainPanel, "RegisterPanel"); //
        // Hacer visible el marco
         this.setVisible(true);
         initComponents();
@@ -458,7 +458,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         programaComboBox.removeAllItems();
         
         for (Programa programa : programas) {
-            if ("S".equals(programa.getActivoPrograma())) {
+            if ("S".equals(programa.getActivoPrograma())) { // Cargar solo programas que se encuentren activos
                 programaComboBox.addItem(programa.getNombrePrograma());
             }
         }

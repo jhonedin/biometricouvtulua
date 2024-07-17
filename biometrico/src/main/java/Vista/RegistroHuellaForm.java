@@ -167,43 +167,10 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
                         makeReport("Error saving the fingerprint to the database.");
                     }
                 }
-                /*
-                if (huellaDAO.agregarHuella(huella)) {
-                    makeReport("The fingerprint has been saved to the database.");
-                } else {
-                    makeReport("Error saving the fingerprint to the database.");
-                }
-                */
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
-        /*
-        DPFPFeatureSet features = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
-
-        if (features != null) {
-            try {
-                DPFPTemplate template = DPFPGlobal.getTemplateFactory().createTemplate();
-                template.deserialize(features.serialize());
-
-                Huella huella = new Huella();
-                String finger = (String) fingerComboBox.getSelectedItem();
-                huella.setUserId(cedulaField.getText() + "-" + finger);
-                huella.setCedula(cedulaField.getText());
-                huella.setHuella(template.serialize());
-                huella.setFecha(new Timestamp(System.currentTimeMillis()));
-                
-                HuellaDAO huellaDAO = new HuellaDAO();
-                if (huellaDAO.agregarHuella(huella)) {
-                    makeReport("The fingerprint has been saved to the database.");
-                } else {
-                    makeReport("Error saving the fingerprint to the database.");
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        */
     }
 
     public void start() {
@@ -241,8 +208,6 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
         Image scaledImage = image.getScaledInstance(picture.getWidth(), picture.getHeight(), Image.SCALE_SMOOTH);
         picture.setIcon(new ImageIcon(scaledImage));
         repaint();
-        //picture.setIcon(new ImageIcon(image));
-        //repaint();
     }
 
     protected Image convertSampleToBitmap(DPFPSample sample) {

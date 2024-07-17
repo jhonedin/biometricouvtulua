@@ -3,6 +3,8 @@ import Modelo.AdministradoresDAO;
 import Modelo.Administradores;
 import Modelo.Docente;
 import Modelo.DocenteDAO;
+import Modelo.Huella;
+import Modelo.HuellaDAO;
 import Modelo.Programa;
 import Modelo.ProgramaDAO;
 
@@ -39,6 +41,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
     JComboBox<String> activoComboBox;
     private JComboBox<String> programaComboBox;
     private Programa programa;
+    private JComboBox<String> huellasComboBox;
     
     
     public NuevoUsuarioFrame() {
@@ -272,7 +275,7 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         huellasLabel.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Ajusto los parametros del JComboBox huellasComboBox para leer de la BD las huellas registradas
-        JComboBox<String> huellasComboBox = new JComboBox<>(new String[]{"cedula-indice-derecho", "cedula-indice-izquierdo"});
+        huellasComboBox = new JComboBox<>(new String[]{"Sin registro de Huella"});
         huellasComboBox.setBounds(515,345,280, 30);
         huellasComboBox.setBackground(Color.WHITE);
         huellasComboBox.setFont(new Font("Arial", Font.BOLD, 13));
@@ -332,6 +335,8 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
                 telefonoField.setText("");
                 programaComboBox.setSelectedIndex(0);
                 activoComboBox.setSelectedIndex(0);
+                huellasComboBox.removeAllItems();
+                huellasComboBox.addItem("Sin registro de huella");
             }
          });    
         
@@ -357,6 +362,8 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
                     programa = programaDAO.obtenerProgramaPorId(docente.getIdPrograma());
                     programaComboBox.setSelectedItem(programa.getNombrePrograma());
                     activoComboBox.setSelectedItem("N".equals(docente.getActivo()) ? "NO" : "SI");
+                     // Cargar huellas registradas del docente
+                    cargarHuellas(cedula);
                 }
             }
         });
@@ -460,6 +467,20 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
         for (Programa programa : programas) {
             if ("S".equals(programa.getActivoPrograma())) { // Cargar solo programas que se encuentren activos
                 programaComboBox.addItem(programa.getNombrePrograma());
+            }
+        }
+    }
+
+    private void cargarHuellas(String cedula) {
+        HuellaDAO huellaDAO = new HuellaDAO();
+        List<Huella> huellas = huellaDAO.obtenerHuellasPorCedula(cedula);
+
+        huellasComboBox.removeAllItems();
+         if (huellas.isEmpty()) {
+            huellasComboBox.addItem("Sin registro de huella");
+        } else {
+            for (Huella huella : huellas) {
+                huellasComboBox.addItem(huella.getUserId());
             }
         }
     }

@@ -7,6 +7,18 @@ public class RegistroAsistencia {
     private String cedula;
     private Timestamp horaIngreso;
     private Timestamp horaSalida;
+    
+    public RegistroAsistencia(){
+        
+    }
+    
+    // Constructor con argumentos
+    public RegistroAsistencia(String cedula, Timestamp horaIngreso) {
+        this.cedula = cedula;
+        this.horaIngreso = horaIngreso;
+    }
+    
+  
 
     // Getters y setters
     public int getIdRegistro() { return idRegistro; }

@@ -4,6 +4,7 @@ import com.digitalpersona.onetouch.*;
 import com.digitalpersona.onetouch.capture.*;
 import com.digitalpersona.onetouch.capture.event.*;
 import com.digitalpersona.onetouch.processing.*;
+import com.digitalpersona.onetouch.verification.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -15,12 +16,18 @@ import Modelo.HuellaDAO;
 public class RegistroHuellaForm extends javax.swing.JFrame {
     
     private DPFPCapture capturer = DPFPGlobal.getCaptureFactory().createCapture();
+    private DPFPEnrollment enroller = DPFPGlobal.getEnrollmentFactory().createEnrollment();
+    private DPFPVerification verifier = DPFPGlobal.getVerificationFactory().createVerification();
     private JLabel picture = new JLabel();
     private JTextField prompt = new JTextField();
     private JTextArea log = new JTextArea();
     private JTextField status = new JTextField("[status line]");
     private JComboBox<String> fingerComboBox;
     private JTextField cedulaField;
+    private JLabel counterLabel = new JLabel("Capturas restantes: 4");
+    private int remainingCaptures = 4; // contador de capturas restantes
+    private boolean isVerificationPhase = false; // bandera para indicar la fase de verificación
+    private DPFPTemplate storedTemplate; // template almacenado para la verificación
     
     /**
      * Creates new form RegistroHuellaForm
@@ -44,13 +51,13 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
         log.setEditable(false);
         log.setFont(UIManager.getFont("Panel.font"));
         JScrollPane logpane = new JScrollPane(log);
-        logpane.setBorder(BorderFactory.createTitledBorder("Status:"));
+        logpane.setBorder(BorderFactory.createTitledBorder("Estado:"));
         
         status.setEditable(false);
         status.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         status.setFont(UIManager.getFont("Panel.font"));
         
-        JButton quit = new JButton("Close");
+        JButton quit = new JButton("Cerrar");
         quit.addActionListener(e -> setVisible(false));
         
         JPanel right = new JPanel(new BorderLayout());
@@ -105,77 +112,130 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
         capturer.addDataListener(new DPFPDataAdapter() {
             @Override public void dataAcquired(final DPFPDataEvent e) {
                 SwingUtilities.invokeLater(() -> {
-                    makeReport("The fingerprint sample was captured.");
-                    setPrompt("Scan the same fingerprint again.");
-                    process(e.getSample());
+                    makeReport("La muestra de huella digital ha sido capturada.");
+                    setPrompt("Escanee la misma huella nuevamente.");
+                    //process(e.getSample());
+                    if (isVerificationPhase) {
+                        processVerification(e.getSample());
+                    } else {
+                        processEnrollment(e.getSample());
+                    }
                 });
             }
         });
         capturer.addReaderStatusListener(new DPFPReaderStatusAdapter() {
             @Override public void readerConnected(final DPFPReaderStatusEvent e) {
-                SwingUtilities.invokeLater(() -> makeReport("The fingerprint reader was connected."));
+                SwingUtilities.invokeLater(() -> makeReport("El lector de huella digital está conectado."));
             }
             @Override public void readerDisconnected(final DPFPReaderStatusEvent e) {
-                SwingUtilities.invokeLater(() -> makeReport("The fingerprint reader was disconnected."));
+                SwingUtilities.invokeLater(() -> makeReport("El lector de huella digital está desconectado."));
             }
         });
         capturer.addSensorListener(new DPFPSensorAdapter() {
             @Override public void fingerTouched(final DPFPSensorEvent e) {
-                SwingUtilities.invokeLater(() -> makeReport("The fingerprint reader was touched."));
+                SwingUtilities.invokeLater(() -> makeReport("El lector de huella digital ha sido tocado."));
             }
             @Override public void fingerGone(final DPFPSensorEvent e) {
-                SwingUtilities.invokeLater(() -> makeReport("The finger was removed from the fingerprint reader."));
+                SwingUtilities.invokeLater(() -> makeReport("El dedo ha sido retirado del lector de huella digital."));
             }
         });
         capturer.addImageQualityListener(new DPFPImageQualityAdapter() {
             @Override public void onImageQuality(final DPFPImageQualityEvent e) {
                 SwingUtilities.invokeLater(() -> {
                     if (e.getFeedback().equals(DPFPCaptureFeedback.CAPTURE_FEEDBACK_GOOD))
-                        makeReport("The quality of the fingerprint sample is good.");
+                        makeReport("La calidad de la muestra de huella digital es buena.");
                     else
-                        makeReport("The quality of the fingerprint sample is poor.");
+                        makeReport("La calidad de la muestra de huella digital es mala.");
                 });
             }
         });
     }
-
-    protected void process(DPFPSample sample) {
+//////////////////////////////////////////////////////////////////////
+    
+    ///// Procesamiento de la huella leida desde el lector biometrico
+        protected void processEnrollment(DPFPSample sample) {
         drawPicture(convertSampleToBitmap(sample));
 
         DPFPFeatureSet features = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
 
         if (features != null) {
             try {
-                DPFPTemplate template = DPFPGlobal.getTemplateFactory().createTemplate();
-                template.deserialize(features.serialize());
+                enroller.addFeatures(features); // Añade las características al enrolador
+                updateStatus();
 
-                Huella huella = new Huella();
-                String finger = (String) fingerComboBox.getSelectedItem();
-                huella.setUserId(cedulaField.getText() + "-" + finger);
-                huella.setCedula(cedulaField.getText());
-                huella.setHuella(template.serialize());
-                huella.setFecha(new Timestamp(System.currentTimeMillis()));
-                
-                HuellaDAO huellaDAO = new HuellaDAO();
-                if (huellaDAO.obtenerHuellaPorId(huella.getUserId()) != null) {
-                    JOptionPane.showMessageDialog(this,huella.getUserId()+" : "+"Esta huella ya está registrada.", "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    if (huellaDAO.agregarHuella(huella)) {
-                        makeReport("The fingerprint has been saved to the database.");
-                         JOptionPane.showMessageDialog(this,"Huella registrada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        makeReport("Error saving the fingerprint to the database.");
-                    }
+                switch (enroller.getTemplateStatus()) {
+                    case TEMPLATE_STATUS_READY: // Template listo
+                        storedTemplate = enroller.getTemplate();
+                        Huella huella = new Huella();
+                        String finger = (String) fingerComboBox.getSelectedItem();
+                        huella.setUserId(cedulaField.getText() + "-" + finger);
+                        huella.setCedula(cedulaField.getText());
+                        huella.setHuella(storedTemplate.serialize());
+                        huella.setFecha(new Timestamp(System.currentTimeMillis()));
+
+                        HuellaDAO huellaDAO = new HuellaDAO();
+                        if (huellaDAO.obtenerHuellaPorId(huella.getUserId()) != null) {
+                            JOptionPane.showMessageDialog(this, huella.getUserId() + " : " + "Esta huella ya está registrada.", "Error", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            if (huellaDAO.agregarHuella(huella)) {
+                                makeReport("La huella digital se ha guardado en la base de datos.");
+                                JOptionPane.showMessageDialog(this, "Huella registrada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                // Pedir al usuario que lea la huella nuevamente para la verificación
+                                prompt.setText("Escanee nuevamente la huella para verificarla.");
+                                JOptionPane.showMessageDialog(this, "Por favor, escanee nuevamente la huella para verificarla.", "Verificación de Huella", JOptionPane.INFORMATION_MESSAGE);
+                                remainingCaptures = 1; // Resetea el contador para la verificación
+                                isVerificationPhase = true;
+                            } else {
+                                makeReport("Error al guardar la huella digital en la base de datos.");
+                            }
+                        }
+                        enroller.clear(); // Limpiar enrolador para el próximo registro
+                        break;
+
+                    case TEMPLATE_STATUS_FAILED: // Fallo en la creación del template
+                        enroller.clear();
+                        stop();
+                        updateStatus();
+                        JOptionPane.showMessageDialog(this, "La plantilla de huella digital no es válida. Repita el proceso de enrolamiento.", "Error de Enrolamiento", JOptionPane.ERROR_MESSAGE);
+                        start();
+                        break;
                 }
-            } catch (Exception ex) {
+            } catch (DPFPImageQualityException ex) {
                 ex.printStackTrace();
             }
         }
     }
+    
+//////////////////////////////////////////    
 
+    protected void processVerification(DPFPSample sample) {
+        drawPicture(convertSampleToBitmap(sample));
+
+        DPFPFeatureSet features = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
+
+        if (features != null && storedTemplate != null) {
+            DPFPVerificationResult result = verifier.verify(features, storedTemplate);
+            if (result.isVerified()) {
+                makeReport("La huella ha sido verificada con éxito.");
+                JOptionPane.showMessageDialog(this, "Verificación de huella exitosa.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                makeReport("La huella no pudo ser verificada.");
+                JOptionPane.showMessageDialog(this, "Verificación de huella fallida.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            isVerificationPhase = false;
+        }
+    }    
+    
+    private void updateStatus() {
+        // Actualizar el estado del enrolamiento
+        setStatus(String.format("Muestras de huella necesarias: %1$s", enroller.getFeaturesNeeded()));
+        remainingCaptures = enroller.getFeaturesNeeded();
+        counterLabel.setText("Capturas restantes: " + remainingCaptures);
+    }
+    
     public void start() {
         capturer.startCapture();
-        setPrompt("Using the fingerprint reader, scan your fingerprint.");
+        setPrompt("Usando el lector de huellas digitales, escanee su huella digital.");
     }
 
     public void stop() {

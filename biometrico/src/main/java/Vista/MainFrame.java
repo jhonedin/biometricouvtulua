@@ -109,8 +109,11 @@ public class MainFrame extends javax.swing.JFrame {
                 newFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
                 // Crear un JLabel en el nuevo JFrame
-                JLabel newLabel = new JLabel("Este es el Frame de Configuraciones");
-                newLabel.setBounds(100, 300, 200, 100);
+                JLabel newLabel = new JLabel("FRAME EN CONTRUCCION");
+                newLabel.setBounds(100, 200, 400, 100);
+                newLabel.setForeground(Color.RED);
+                newLabel.setFont(new Font("Arial", Font.BOLD, 24));
+                newLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 newFrame.add(newLabel);
 
                 newFrame.setLayout(null); // Establecer el diseño nulo para usar setBounds

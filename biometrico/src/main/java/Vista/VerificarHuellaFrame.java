@@ -11,6 +11,25 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import Modelo.DocenteDAO;
+import javax.swing.JComboBox;
+
+import com.digitalpersona.onetouch.*;
+import com.digitalpersona.onetouch.capture.*;
+import com.digitalpersona.onetouch.capture.event.*;
+import com.digitalpersona.onetouch.processing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import javax.swing.*;
+import Modelo.Huella;
+import Modelo.HuellaDAO;
+import Modelo.RegistroAsistencia;
+import Modelo.RegistroAsistenciaDAO;
+import com.digitalpersona.onetouch.verification.DPFPVerification;
+import com.digitalpersona.onetouch.verification.DPFPVerificationResult;
 
 public class VerificarHuellaFrame extends javax.swing.JFrame {
     private JLabel tituloLabel;
@@ -18,10 +37,22 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
     private JLabel docenteLabel;
     private JLabel horaEntradaLabel;
     private JLabel horaSalidaLabel;
+    private JLabel huellasRegistradas;
     private JButton cerrarButton;
     private JTextField docenteIdentificado;
     private JTextField horaEntrada;
     private JTextField horaSalida;
+    private JComboBox<String> huellasComboBox;
+    
+    /////
+    private JLabel picture = new JLabel();
+    private JTextArea log = new JTextArea();
+    private JTextField status = new JTextField("[status line]");
+    private DPFPCapture capturer = DPFPGlobal.getCaptureFactory().createCapture();
+    private DPFPVerification verificator = DPFPGlobal.getVerificationFactory().createVerification();
+    private String cedula;    
+    
+    ////
     
     public VerificarHuellaFrame(){
     
@@ -89,6 +120,19 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         horaSalida.setText(getHoraSalidaDocenteIdentificado());
         horaSalida.setEditable(false);
         
+        // Ajusto los parametros del JLabel huellasRegistradas
+        huellasRegistradas = new JLabel("Huellas registradas:");
+        huellasRegistradas.setBounds(330,345,300, 20);
+        huellasRegistradas.setForeground(Color.RED);
+        huellasRegistradas.setFont(new Font("Arial", Font.BOLD, 18));
+        
+         // Ajusto los parametros del JComboBox huellasComboBox para leer de la BD las huellas registradas
+        huellasComboBox = new JComboBox<>(new String[]{"Sin registro de Huella"});
+        huellasComboBox.setBounds(510,340,220, 30);
+        huellasComboBox.setBackground(Color.WHITE);
+        huellasComboBox.setFont(new Font("Arial", Font.BOLD, 13));
+        
+        
         // Ajusto los parametros del boton de cerrar
         cerrarButton = new JButton("Cerrar");
         cerrarButton.setBounds(580,480, 150, 30);
@@ -108,6 +152,39 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         panelVerificarHuella.add(horaSalidaLabel);
         panelVerificarHuella.add(horaEntrada);
         panelVerificarHuella.add(horaSalida);
+        panelVerificarHuella.add(huellasRegistradas);
+        panelVerificarHuella.add(huellasComboBox);
+        
+        // Cargar huellas
+        cargarHuellas(cedula);
+        
+        /////////////////////////////
+        // Componentes adicionales para la imagen de la huella y el log
+        picture.setBounds(40, 100, 240, 280);
+        picture.setBorder(BorderFactory.createLoweredBevelBorder());
+        add(picture);
+
+        log.setBounds(40, 400, 400, 100);
+        log.setEditable(false);
+        log.setFont(UIManager.getFont("Panel.font"));
+        JScrollPane logpane = new JScrollPane(log);
+        logpane.setBounds(40, 400, 400, 100);
+        logpane.setBorder(BorderFactory.createTitledBorder("Estado del Proceso"));
+        add(logpane);
+
+        status.setBounds(40, 510, 400, 30);
+        status.setEditable(false);
+        status.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        status.setFont(UIManager.getFont("Panel.font"));
+        add(status);        
+        
+        // Iniciar captura de huella
+        init();
+        start();
+        
+        /////////////////////////////
+        
+        
         
         // Agregar el panel al marco
         this.add(panelVerificarHuella);
@@ -140,6 +217,167 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
     public String getHoraSalidaDocenteIdentificado(){
         return "NO REGISTRADO";
     }
+    
+    private void cargarHuellas(String cedula) {
+        HuellaDAO huellaDAO = new HuellaDAO();
+        List<Huella> huellas = huellaDAO.obtenerHuellasPorCedula(cedula);
+
+        huellasComboBox.removeAllItems();
+        if (huellas.isEmpty()) {
+            huellasComboBox.addItem("Sin registro de huella");
+        } else {
+            for (Huella huella : huellas) {
+                huellasComboBox.addItem(huella.getUserId());
+            }
+        }
+    }
+
+    private void init() {
+        capturer.addDataListener(new DPFPDataAdapter() {
+            @Override
+            public void dataAcquired(final DPFPDataEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    makeReport("La muestra de huella digital ha sido capturada.");
+                    setPrompt("Escanee la misma huella nuevamente.");
+                    process(e.getSample());
+                });
+            }
+        });
+        capturer.addReaderStatusListener(new DPFPReaderStatusAdapter() {
+            @Override
+            public void readerConnected(final DPFPReaderStatusEvent e) {
+                SwingUtilities.invokeLater(() -> makeReport("El lector de huella digital está conectado."));
+            }
+
+            @Override
+            public void readerDisconnected(final DPFPReaderStatusEvent e) {
+                SwingUtilities.invokeLater(() -> makeReport("El lector de huella digital está desconectado."));
+            }
+        });
+        capturer.addSensorListener(new DPFPSensorAdapter() {
+            @Override
+            public void fingerTouched(final DPFPSensorEvent e) {
+                SwingUtilities.invokeLater(() -> makeReport("El lector de huella digital ha sido tocado."));
+            }
+
+            @Override
+            public void fingerGone(final DPFPSensorEvent e) {
+                SwingUtilities.invokeLater(() -> makeReport("El dedo ha sido retirado del lector de huella digital."));
+            }
+        });
+        capturer.addImageQualityListener(new DPFPImageQualityAdapter() {
+            @Override
+            public void onImageQuality(final DPFPImageQualityEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    if (e.getFeedback().equals(DPFPCaptureFeedback.CAPTURE_FEEDBACK_GOOD))
+                        makeReport("La calidad de la muestra de huella digital es buena.");
+                    else
+                        makeReport("La calidad de la muestra de huella digital es mala.");
+                });
+            }
+        });
+    }    
+
+    protected void process(DPFPSample sample) {
+        drawPicture(convertSampleToBitmap(sample));
+
+        DPFPFeatureSet features = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
+
+        if (features != null) {
+            try {
+                DPFPVerificationResult result = null;
+                HuellaDAO huellaDAO = new HuellaDAO();
+                List<Huella> huellas = huellaDAO.obtenerHuellasPorCedula(cedula);
+
+                for (Huella huella : huellas) {
+                    DPFPTemplate template = DPFPGlobal.getTemplateFactory().createTemplate(huella.getHuella());
+                    result = verificator.verify(features, template);
+                    //result = DPFPGlobal.getVerificationFactory().createVerification().verify(features, template);
+                    if (result.isVerified()) {
+                        makeReport("La huella digital coincide con " + huella.getUserId());
+                        verificarYRegistrarAsistencia(huella.getCedula());
+                        return;
+                    }
+                }
+                if (result == null || !result.isVerified()) {
+                    JOptionPane.showMessageDialog(this, "La huella digital no coincide con ninguna registrada.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
+    private void verificarYRegistrarAsistencia(String cedula) {
+        try {
+            RegistroAsistenciaDAO registroAsistenciaDAO = new RegistroAsistenciaDAO();
+            RegistroAsistencia registroAsistencia = registroAsistenciaDAO.obtenerRegistroAsistenciaPorCedulaYFecha(cedula, new java.sql.Date(System.currentTimeMillis()));
+
+            if (registroAsistencia != null) {
+                // Ya existe un registro de ingreso para el día de hoy, registrar la hora de salida
+                Timestamp horaIngreso = registroAsistencia.getHoraIngreso();
+                Timestamp horaSalida = registroAsistencia.getHoraSalida();
+
+                if (horaSalida == null) {
+                    registroAsistenciaDAO.registrarSalida(registroAsistencia.getIdRegistro());
+                    makeReport("Hora de salida registrada con éxito.");
+                } else {
+                    makeReport("Ya se ha registrado la hora de salida para hoy.");
+                }
+            } else {
+                // No existe un registro de ingreso para el día de hoy, registrar la hora de ingreso
+                registroAsistenciaDAO.registrarIngreso(new RegistroAsistencia(cedula, new Timestamp(System.currentTimeMillis())));
+                makeReport("Hora de ingreso registrada con éxito.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al registrar la asistencia.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    
+
+    protected void start() {
+        capturer.startCapture();
+        setPrompt("Usando el lector de huella digital, escanee su huella.");
+    }
+
+    protected void stop() {
+        capturer.stopCapture();
+    }
+
+    public void setPrompt(String string) {
+        status.setText(string);
+    }
+
+    public void makeReport(String string) {
+        log.append(string + "\n");
+    }
+
+    public void setStatus(String string) {
+        status.setText(string);
+    }
+
+    protected DPFPFeatureSet extractFeatures(DPFPSample sample, DPFPDataPurpose purpose) {
+        DPFPFeatureExtraction extractor = DPFPGlobal.getFeatureExtractionFactory().createFeatureExtraction();
+        try {
+            return extractor.createFeatureSet(sample, purpose);
+        } catch (DPFPImageQualityException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    protected void drawPicture(Image image) {
+        Image scaledImage = image.getScaledInstance(picture.getWidth(), picture.getHeight(), Image.SCALE_SMOOTH);
+        picture.setIcon(new ImageIcon(scaledImage));
+        repaint();
+    }
+
+    protected Image convertSampleToBitmap(DPFPSample sample) {
+        return DPFPGlobal.getSampleConversionFactory().createImage(sample);
+    }    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.

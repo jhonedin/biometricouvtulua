@@ -131,6 +131,88 @@ public class RegistroAsistenciaDAO {
         return null;
     }
     
+    //////////////
+    public RegistroAsistencia obtenerRegistroAsistenciaPorCedulaYFecha(String cedula, Date fecha) {
+        RegistroAsistencia registroAsistencia = null;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = conexion.getConnection();
+            String query = "SELECT * FROM registroasistencia WHERE cedula = ? AND DATE(horaingreso) = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setString(1, cedula);
+            stmt.setDate(2, fecha);
+            rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                registroAsistencia = new RegistroAsistencia();
+                registroAsistencia.setIdRegistro(rs.getInt("idregistro"));
+                registroAsistencia.setCedula(rs.getString("cedula"));
+                registroAsistencia.setHoraIngreso(rs.getTimestamp("horaingreso"));
+                registroAsistencia.setHoraSalida(rs.getTimestamp("horasalida"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return registroAsistencia;
+    }    
+
+    public void registrarIngreso(RegistroAsistencia registroAsistencia) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            conn = conexion.getConnection();
+            String query = "INSERT INTO registroasistencia (cedula, horaingreso) VALUES (?, ?)";
+            stmt = conn.prepareStatement(query);
+            stmt.setString(1, registroAsistencia.getCedula());
+            stmt.setTimestamp(2, registroAsistencia.getHoraIngreso());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }    
+    
+    public void registrarSalida(int idRegistro) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            conn = conexion.getConnection();
+            String query = "UPDATE registroasistencia SET horasalida = CURRENT_TIMESTAMP WHERE idregistro = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, idRegistro);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null) conn.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }    
+    
+    //////////////
+    
     
     
 

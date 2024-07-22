@@ -27,7 +27,10 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
     private JLabel counterLabel = new JLabel("Capturas restantes: 4");
     private int remainingCaptures = 4; // contador de capturas restantes
     private boolean isVerificationPhase = false; // bandera para indicar la fase de verificación
-    private DPFPTemplate storedTemplate; // template almacenado para la verificación
+    //private DPFPTemplate storedTemplate; // template almacenado para la verificación
+    private String lastRegisteredHuellaId; // ID de la última huella registrada
+    
+    
     
     /**
      * Creates new form RegistroHuellaForm
@@ -103,6 +106,8 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
             }
         });  
         
+        verifier.setFARRequested(DPFPVerification.MEDIUM_SECURITY_FAR); // Configurar el FAR a un nivel medio de seguridad
+        
         pack();
         setLocationRelativeTo(null);        
         initComponents();
@@ -113,7 +118,7 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
             @Override public void dataAcquired(final DPFPDataEvent e) {
                 SwingUtilities.invokeLater(() -> {
                     makeReport("La muestra de huella digital ha sido capturada.");
-                    setPrompt("Escanee la misma huella nuevamente.");
+                    //setPrompt("Escanee la misma huella nuevamente.");
                     //process(e.getSample());
                     if (isVerificationPhase) {
                         processVerification(e.getSample());
@@ -165,12 +170,12 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
 
                 switch (enroller.getTemplateStatus()) {
                     case TEMPLATE_STATUS_READY: // Template listo
-                        storedTemplate = enroller.getTemplate();
+                        DPFPTemplate template = enroller.getTemplate();
                         Huella huella = new Huella();
                         String finger = (String) fingerComboBox.getSelectedItem();
                         huella.setUserId(cedulaField.getText() + "-" + finger);
                         huella.setCedula(cedulaField.getText());
-                        huella.setHuella(storedTemplate.serialize());
+                        huella.setHuella(template.serialize());
                         huella.setFecha(new Timestamp(System.currentTimeMillis()));
 
                         HuellaDAO huellaDAO = new HuellaDAO();
@@ -180,6 +185,9 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
                             if (huellaDAO.agregarHuella(huella)) {
                                 makeReport("La huella digital se ha guardado en la base de datos.");
                                 JOptionPane.showMessageDialog(this, "Huella registrada con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                // Guardar el ID de la última huella registrada
+                                lastRegisteredHuellaId = huella.getUserId();
+                                System.out.println("ID de la última huella registrada: " + lastRegisteredHuellaId); // Depuración
                                 // Pedir al usuario que lea la huella nuevamente para la verificación
                                 prompt.setText("Escanee nuevamente la huella para verificarla.");
                                 JOptionPane.showMessageDialog(this, "Por favor, escanee nuevamente la huella para verificarla.", "Verificación de Huella", JOptionPane.INFORMATION_MESSAGE);
@@ -205,7 +213,6 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
             }
         }
     }
-    
 //////////////////////////////////////////    
 
     protected void processVerification(DPFPSample sample) {
@@ -213,19 +220,36 @@ public class RegistroHuellaForm extends javax.swing.JFrame {
 
         DPFPFeatureSet features = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
 
-        if (features != null && storedTemplate != null) {
-            DPFPVerificationResult result = verifier.verify(features, storedTemplate);
-            if (result.isVerified()) {
-                makeReport("La huella ha sido verificada con éxito.");
-                JOptionPane.showMessageDialog(this, "Verificación de huella exitosa.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                makeReport("La huella no pudo ser verificada.");
-                JOptionPane.showMessageDialog(this, "Verificación de huella fallida.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (features != null) {
+            try {
+                // Obtener la huella guardada de la base de datos
+                System.out.println("Consultando la huella con ID: " + lastRegisteredHuellaId); // Depuración
+                HuellaDAO huellaDAO = new HuellaDAO();
+                Huella huella = huellaDAO.obtenerHuellaPorId(lastRegisteredHuellaId);
+
+                if (huella != null) {
+                    System.out.println("Huella encontrada en la base de datos."); // Depuración
+                    DPFPTemplate template = DPFPGlobal.getTemplateFactory().createTemplate(huella.getHuella());
+                    DPFPVerificationResult result = verifier.verify(features, template);
+                    System.out.println("FAR: " + result.getFalseAcceptRate()); // Depuración del FAR
+                    if (result.isVerified()) {
+                        makeReport("La huella ha sido verificada con éxito.");
+                        JOptionPane.showMessageDialog(this, "Verificación de huella exitosa.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        makeReport("La huella no pudo ser verificada.");
+                        JOptionPane.showMessageDialog(this, "Verificación de huella fallida.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    makeReport("No se pudo encontrar la huella registrada en la base de datos.");
+                    JOptionPane.showMessageDialog(this, "No se pudo encontrar la huella registrada en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
             isVerificationPhase = false;
         }
-    }    
-    
+    }
+       
     private void updateStatus() {
         // Actualizar el estado del enrolamiento
         setStatus(String.format("Muestras de huella necesarias: %1$s", enroller.getFeaturesNeeded()));

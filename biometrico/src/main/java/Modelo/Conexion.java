@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.swing.JOptionPane;
 
 public class Conexion {
     private static String URL = "jdbc:mysql://192.168.14.85:3306/biometrico";
@@ -21,6 +22,10 @@ public class Conexion {
             System.out.println("Conexion exitosa a la base de datos.");
         } catch (SQLException e) {
             System.err.println("Error al conectar a la base de datos: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, 
+                                          "No hay conexión a la base de datos.", 
+                                          "Error de Conexión", 
+                                          JOptionPane.ERROR_MESSAGE);
         }
         return connection;
     }

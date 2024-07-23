@@ -25,6 +25,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import Vista.RegistroHuellaForm;
+import javax.swing.JTextPane;
 
 public class NuevoUsuarioFrame extends javax.swing.JFrame {
     
@@ -395,17 +396,53 @@ public class NuevoUsuarioFrame extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Docente no identificado no se puede Enrolar Huella");
                     return;
                 } else {
-                    JOptionPane.showMessageDialog(null, "Enrolar huella para el docente: "+
-                            doc.getCedula()+" "+
-                            doc.getPrimerNombre()+" "+
-                            doc.getPrimerApellido()
+                    // Crear el mensaje con alineación justificada
+                    JTextPane textPane = new JTextPane();
+                    textPane.setContentType("text/html");
+                    textPane.setText(
+                        "<html><body style='text-align:justify;'>Enrolar huella para el docente: " + doc.getCedula() + " " +
+                        doc.getPrimerNombre() + " " + doc.getPrimerApellido() + "<br><br>" +
+                        "<strong>AUTORIZACIÓN DEL TRATAMIENTO DE DATOS PERSONALES</strong><br><br>" +
+                        "En cumplimiento a nuestro deber de informar tal como lo dispone la Ley 1581 de 2012, la Universidad del Valle,<br>" +
+                        "le comunica que los datos personales suministrados serán utilizados por la Oficina de Gestion Humana,<br>" + 
+                        "y la Dirección de la sede Tulua,con la finalidad de llevar un adecuado registro de la asistencia docente <br>" +
+                        "a los campus de la sede Tulua, y seran tratados conforme la política de tratamiento de datos personales<br>" +
+                        "de la Universidad del Valle publicada en la página web: <a href='http://www.univalle.edu.co/'>http://www.univalle.edu.co/</a><br><br>" +
+                        "Para ejercer su derecho de conocer, actualizar o rectificar la información puede contactarnos a través de los siguientes canales:<br>" +
+                        "* Mediante nuestro Programa de Atención al Ciudadano, diligenciando el formato en la opción protección de datos a través de la página<br>" +
+                        "<a href='http://atencionalciudadano.univalle.edu.co/'>http://atencionalciudadano.univalle.edu.co/</a> o;<br>" +
+                        "* Escribiendo al correo electrónico de PQRSD <a href='mailto:quejasyreclamos@correounivalle.edu.co'>quejasyreclamos@correounivalle.edu.co</a><br><br>" +
+                        "¿Autoriza al tratamiento de sus datos personales?</body></html>"
+                        );
+                        textPane.setEditable(false);
+                        // Mostrar el cuadro de diálogo con las opciones Aceptar y Rechazar
+                        Object[] options = {"Aceptar", "Rechazar"};
+                        int option = JOptionPane.showOptionDialog(null,
+                                textPane,
+                                "Confirmación",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE,
+                                null,
+                                options,
+                                options[0]);
+
+                        // Manejar la respuesta del usuario
+                        if (option == JOptionPane.YES_OPTION) {
+                            RegistroHuellaForm huellaForm = new RegistroHuellaForm(cedula);
+                            huellaForm.setVisible(true);
+                            huellaForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                        } else if (option == JOptionPane.NO_OPTION) {
+                            // Crear el mensaje de rechazo con alineación justificada
+                            JTextPane rejectionPane = new JTextPane();
+                            rejectionPane.setContentType("text/html");
+                            rejectionPane.setText(
+                                    "<html><body style='text-align:justify;'>Ha decidido rechazar la política de tratamiento de datos personales,<br>" +
+                                            "y el registro de su huella biométrica.</body></html>"
                             );
-                    // Instanciar el formulario de registro de huella
-                    RegistroHuellaForm huellaForm = new RegistroHuellaForm(cedula);
-                    huellaForm.setVisible(true);
-                    huellaForm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    //FingerprintRegistrationForm form = new FingerprintRegistrationForm(cedula);
-                    //form.setVisible(true);
+                            rejectionPane.setEditable(false);
+
+                            JOptionPane.showMessageDialog(null, rejectionPane, "Rechazo", JOptionPane.INFORMATION_MESSAGE);
+                        }
                 } 
             }
         });

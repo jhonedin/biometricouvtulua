@@ -139,13 +139,11 @@ public class MainFrame extends javax.swing.JFrame {
                     VerificarHuellaFrame verificarHuella = new VerificarHuellaFrame(textFieldCedula.getText().toString());
                     verificarHuella.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                     verificarHuella.setVisible(true);
+                    textFieldCedula.setText("");
                 } else {
                     JOptionPane.showMessageDialog(MainFrame.this, "Cédula no registrada", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                /*
-                else if ("N".equals(docente.getActivo())) {
-                    JOptionPane.showMessageDialog(null, "Docente no registrado");
-                */
+                
             } 
         });
         

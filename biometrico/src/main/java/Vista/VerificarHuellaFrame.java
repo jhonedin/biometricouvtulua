@@ -112,7 +112,7 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         
         // Ajusto los parametros del campo de texto JTextField horaEntrada
         horaEntrada = new JTextField();
-        horaEntrada.setBounds(460,190, 150, 40);
+        horaEntrada.setBounds(460,190, 290, 40);
         horaEntrada.setFont(new Font("Arial", Font.BOLD, 16));
         horaEntrada.setText(getHoraEntradaDocenteIdentificado());
         horaEntrada.setEditable(false);
@@ -125,7 +125,7 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
         
         // Ajusto los parametros del campo de texto JTextField horaSalida
         horaSalida = new JTextField();
-        horaSalida.setBounds(460,260, 150, 40);
+        horaSalida.setBounds(460,260, 290, 40);
         horaSalida.setFont(new Font("Arial", Font.BOLD, 16));
         horaSalida.setText(getHoraSalidaDocenteIdentificado());
         horaSalida.setEditable(false);
@@ -225,7 +225,8 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
             RegistroAsistenciaDAO registroAsistenciaDAO = new RegistroAsistenciaDAO();
             RegistroAsistencia registroAsistencia = registroAsistenciaDAO.obtenerRegistroAsistenciaPorCedulaYFecha(cedula, new java.sql.Date(System.currentTimeMillis()));
             if (registroAsistencia != null && registroAsistencia.getHoraIngreso() != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("EEEE, dd MMMM yyyy hh:mm:ss a");
                 return sdf.format(registroAsistencia.getHoraIngreso());
             }
         } catch (Exception e) {
@@ -239,7 +240,8 @@ public class VerificarHuellaFrame extends javax.swing.JFrame {
             RegistroAsistenciaDAO registroAsistenciaDAO = new RegistroAsistenciaDAO();
             RegistroAsistencia registroAsistencia = registroAsistenciaDAO.obtenerRegistroAsistenciaPorCedulaYFecha(cedula, new java.sql.Date(System.currentTimeMillis()));
             if (registroAsistencia != null && registroAsistencia.getHoraSalida() != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("EEEE, dd MMMM yyyy hh:mm:ss a");
                 return sdf.format(registroAsistencia.getHoraSalida());
             }
         } catch (Exception e) {

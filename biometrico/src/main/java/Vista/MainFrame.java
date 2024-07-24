@@ -27,9 +27,6 @@ public class MainFrame extends javax.swing.JFrame {
     private JButton btnConfiguracion;
     private JButton btnCerrar;
     
-    
-    
-    
     /**
      * Creates new form MainFrame
      */
@@ -189,7 +186,7 @@ public class MainFrame extends javax.swing.JFrame {
         panelMainFrame.add(labelMensaje);
         panelMainFrame.add(relojLabel);
         panelMainFrame.add(btnCerrar);
-        panelMainFrame.add(btnConfiguracion);
+        //panelMainFrame.add(btnConfiguracion);
         
         // Agregar el panel al marco
         this.add(panelMainFrame);
